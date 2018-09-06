@@ -17,12 +17,12 @@ FOOTER = """
 Everything you wrote was stored somewhere! ...Or maybe not.
 """
 
-CONFIG_PATH = os.path.expanduser('~/.redacted')
+PATHS_PATH = os.path.expanduser('~/.redacted')
 
-def read_config():
+def read_paths():
     try:
-        with open(CONFIG_PATH, 'r', encoding='utf-8') as config_file:
-            lines = config_file.read().strip().splitlines()
+        with open(PATHS_PATH, 'r', encoding='utf-8') as paths_file:
+            lines = paths_file.read().strip().splitlines()
             lines = [line.strip() for line in lines]
             keys, values = zip(*[line.split(': ') for line in lines])
             numbers = [int(key) for key in keys]
@@ -32,24 +32,29 @@ def read_config():
     except FileNotFoundError:
         return None
 
-def write_config(number, path):
-    with open(CONFIG_PATH, 'a+', encoding='utf-8') as config_file:
+def write_paths(number, path):
+    with open(PATHS_PATH, 'a+', encoding='utf-8') as paths_file:
         line = f'{number}: {path}'
-        config_file.writelines([line])
+        paths_file.writelines(['', line])
 
 def num_entries():
-    config = read_config()
-    if config is None:
+    paths = read_paths()
+    if paths is None:
         return 0
 
-    return len(config)
+    return len(paths)
+
+def handle_cr(ch):
+    if ch != '\r':
+        return ch
+    return os.linesep
 
 def main():
     n = num_entries()
 
     print(HEADER)
     with NamedTemporaryFile(mode='w+', delete=False) as tempfile:
-        write_config(n + 1, tempfile.name)
+        write_paths(n + 1, tempfile.name)
 
         try:
             wordlen = 0
@@ -70,7 +75,7 @@ def main():
                     sys.stdout.flush()
                     wordlen += 1
 
-                tempfile.write(ch)
+                tempfile.write(handle_cr(ch))
         except KeyboardInterrupt:
             print(FOOTER)
 
