@@ -59,14 +59,12 @@ def main():
 
                 if val == 27: # ESC
                     raise KeyboardInterrupt()
-
-                if val not in range(32, 126 + 1): # NOTE: Delete should be ignored
-                    continue
-
-                if (ch == ' ' or ch == '\r' or ch == '\n' or ch == '\t'):
+                elif (ch == ' ' or ch == '\r' or ch == '\n' or ch == '\t'):
                     sys.stdout.write('\r' + (' ' * wordlen) + ('\b' * wordlen))
                     sys.stdout.flush()
                     wordlen = 0
+                elif val not in range(32, 126 + 1): # NOTE: Delete should be ignored
+                    continue
                 else:
                     sys.stdout.write(ch)
                     sys.stdout.flush()
